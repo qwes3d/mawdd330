@@ -35,17 +35,31 @@ export default class ProductList {
       this.listElement.appendChild(card);
     });
   }
+renderOneProduct(product) {
+  const card = document.createElement("li");
+  card.classList.add("product-card");
 
-  renderOneProduct(product) {
-    const card = document.createElement("li");
-    card.classList.add("product-card");
-    card.innerHTML = `
-      <a href="../product_pages/index.html?product=${product.Id}">
-        <img src="${product.Image}" alt="${product.NameWithoutBrand}">
-        <h2 class="card__brand">${product.Brand.Name}</h2>
-        <h3 class="card__name">${product.NameWithoutBrand}</h3>
-        <p class="product-card__price">₦${product.FinalPrice.toFixed(2)}</p>
-      </a>`;
-    return card;
-  }
+  // Discount logic
+  const hasDiscount = product.ListPrice > product.FinalPrice;
+  const discountPercent = hasDiscount
+    ? Math.round(((product.ListPrice - product.FinalPrice) / product.ListPrice) * 100)
+    : 0;
+
+  card.innerHTML = `
+    <a href="../product_pages/index.html?product=${product.Id}">
+      <img src="${product.Image}" alt="${product.NameWithoutBrand}">
+      <h2 class="card__brand">${product.Brand.Name}</h2>
+      <h3 class="card__name">${product.NameWithoutBrand}</h3>
+      <p class="product-card__price">
+        ${hasDiscount ? `<span class="list-price">₦${product.ListPrice.toFixed(2)}</span>` : ""}
+        <span class="final-price">₦${product.FinalPrice.toFixed(2)}</span>
+        ${hasDiscount ? `<span class="discount">Save ${discountPercent}%</span>` : ""}
+      </p>
+    </a>
+  `;
+
+  return card;
 }
+
+}
+
