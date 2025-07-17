@@ -41,59 +41,57 @@ export default class ProductDetails {
     setLocalStorage("so-cart", cartItems);
     alert('Product added to cart!');
   }
+renderProductDetails() {
+  const brandName = this.product.Brand?.Name || '';
+  const name = this.product.NameWithoutBrand || this.product.Name || '';
+  const imageSrc = this.product.Image || '';
+  const imageAlt = this.product.Name || '';
+  const color = this.product.Colors?.[0]?.ColorName || '';
+  const description = this.product.DescriptionHtmlSimple || '';
 
-  renderProductDetails() {
-    const brandName = this.product.Brand?.Name || '';
-    const name = this.product.NameWithoutBrand || this.product.Name || '';
-    const imageSrc = this.product.Image || '';
-    const imageAlt = this.product.Name || '';
-    const color = this.product.Colors?.[0]?.ColorName || '';
-    const description = this.product.DescriptionHtmlSimple || '';
+  const listPrice = parseFloat(this.product.ListPrice) || 0;
+  const finalPrice = parseFloat(this.product.FinalPrice) || 0;
 
-    const listPrice = this.product.ListPrice;
-    const finalPrice = this.product.FinalPrice;
+  document.querySelector(".product-detail h3").textContent = brandName;
+  document.querySelector(".divider h2").textContent = name;
+  document.querySelector(".divider img").src = imageSrc;
+  document.querySelector(".divider img").alt = imageAlt;
+  document.querySelector(".product__color").textContent = color;
+  document.querySelector(".product__description").innerHTML = description;
+  document.querySelector("#addToCart").dataset.id = this.product.Id;
 
-    document.querySelector(".product-detail h3").textContent = brandName;
-    document.querySelector(".divider h2").textContent = name;
-    document.querySelector(".divider img").src = imageSrc;
-    document.querySelector(".divider img").alt = imageAlt;
-    document.querySelector(".product__color").textContent = color;
-    document.querySelector(".product__description").innerHTML = description;
-    document.querySelector("#addToCart").dataset.id = this.product.Id;
+  const priceContainer = document.querySelector(".product-card__price");
+  priceContainer.innerHTML = `$${finalPrice.toFixed(2)}`;
 
-    const priceContainer = document.querySelector(".product-card__price");
-    priceContainer.innerHTML = `$${finalPrice.toFixed(2)}`;
+  // Add list price and discount if there’s a markdown
+  if (listPrice > finalPrice) {
+    const originalPriceEl = document.createElement("span");
+    originalPriceEl.classList.add("list-price");
+    originalPriceEl.style.textDecoration = "line-through";
+    originalPriceEl.style.marginLeft = "1rem";
+    originalPriceEl.style.color = "#888";
+    originalPriceEl.textContent = `$${listPrice.toFixed(2)}`;
+    priceContainer.appendChild(originalPriceEl);
 
-    // 💸 Add original price (ListPrice) if discounted
-    if (listPrice > finalPrice) {
-      const originalPriceEl = document.createElement("span");
-      originalPriceEl.classList.add("list-price");
-      originalPriceEl.style.textDecoration = "line-through";
-      originalPriceEl.style.marginLeft = "1rem";
-      originalPriceEl.style.color = "#888";
-      originalPriceEl.textContent = `$${listPrice.toFixed(2)}`;
-      priceContainer.appendChild(originalPriceEl);
+    const discountAmount = listPrice - finalPrice;
+    const discountPercent = ((discountAmount / listPrice) * 100).toFixed(0);
 
-      // 💰 Discount badge
-      const discountAmount = listPrice - finalPrice;
-      const discountPercent = ((discountAmount / listPrice) * 100).toFixed(0);
+    const discountBadge = document.createElement("p");
+    discountBadge.classList.add("discount-indicator");
+    discountBadge.innerHTML = `
+      <span class="badge" style="
+        background-color: #d32f2f;
+        color: white;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-top: 0.5rem;">
+        Save $${discountAmount.toFixed(2)} (${discountPercent}%)
+      </span>
+    `;
 
-      const discountBadge = document.createElement("p");
-      discountBadge.classList.add("discount-indicator");
-      discountBadge.innerHTML = `
-        <span class="badge" style="
-          background-color: #d32f2f;
-          color: white;
-          padding: 0.3rem 0.7rem;
-          border-radius: 4px;
-          font-size: 0.9rem;
-          display: inline-block;
-          margin-top: 0.5rem;">
-          Save $${discountAmount.toFixed(2)} (${discountPercent}%)
-        </span>
-      `;
-
-      priceContainer.after(discountBadge);
-    }
+    priceContainer.after(discountBadge);
   }
+}
 }

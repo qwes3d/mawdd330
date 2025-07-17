@@ -9,7 +9,7 @@ const dataSource = new ProductData('tents');
 dataSource.findProductById(productId).then((product) => {
   if (product) {
     renderProductDetails(product); // Make sure this is a function or call ProductDetails.render(product)
-  } else {
+  } else { 
     document.getElementById("product-detail").textContent = "Product not found.";
   }
 }).catch((err) => {
