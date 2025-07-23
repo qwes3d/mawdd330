@@ -55,3 +55,70 @@ export function renderListWithTemplate(templateFn, parentElement, list, position
   const htmlString = list.map(templateFn).join("");
   parentElement.insertAdjacentHTML(position, htmlString);
 }
+
+// utils.mjs
+
+/**
+ * Renders a single template with data
+ * @param {HTMLTemplateElement} template 
+ * @param {HTMLElement} parentElement 
+ * @param {Object} data 
+ * @param {Function} [callback] 
+ */
+export function renderWithTemplate(template, parentElement, data, callback) {
+  const clone = template.content.cloneNode(true);
+  parentElement.appendChild(clone);
+  
+  if (callback) {
+    callback(data);
+  }
+}
+
+/**
+ * Loads HTML template from file
+ * @param {string} path 
+ * @returns {Promise<string>}
+ */
+export async function loadTemplate(path) {
+  const response = await fetch(path);
+  if (!response.ok) {
+    throw new Error(`Failed to load template: ${path}`);
+  }
+  return await response.text();
+}
+
+/**
+ * Loads and renders header/footer
+ * @param {string} headerPath 
+ * @param {string} footerPath 
+ */
+export async function loadHeaderFooter(headerPath = './partials/header.html', footerPath = './partials/footer.html') {
+  const headerElement = document.getElementById('header');
+  const footerElement = document.getElementById('footer');
+  
+  try {
+    // Load and render header
+    if (headerElement) {
+      const headerHtml = await loadTemplate(headerPath);
+      const headerTemplate = document.createElement('template');
+      headerTemplate.innerHTML = headerHtml;
+      renderWithTemplate(headerTemplate, headerElement);
+    }
+    
+    // Load and render footer
+    if (footerElement) {
+      const footerHtml = await loadTemplate(footerPath);
+      const footerTemplate = document.createElement('template');
+      footerTemplate.innerHTML = footerHtml;
+      renderWithTemplate(footerTemplate, footerElement);
+    }
+    
+    // Initialize cart icon if needed
+    if (typeof initCartIcon === 'function') {
+      initCartIcon();
+    }
+    
+  } catch (err) {
+    console.error('Error loading templates:', err);
+  }
+}
